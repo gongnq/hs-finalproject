@@ -1,0 +1,48 @@
+========== KERNEL MICRO-BENCHMARK REPORT ==========
+System: BusyBox + perf available
+---------------------------------------------------
+
+[TEST 1] fork + exec latency
+Purpose   : Measure overhead of process creation and termination
+Command   : busybox true (run 50 times)
+----------------------------------------
+real	0m 1.89s
+user	0m 1.18s
+sys	0m 0.60s
+
+[TEST 2] Disk I/O (write & delete 5MB)
+Purpose   : Measure cost of writing and removing a file
+Command   : dd if=/dev/zero of=/tmp/testfile bs=1M count=5
+File Size : 5 MB
+----------------------------------------
+5+0 records in
+5+0 records out
+real	0m 0.16s
+user	0m 0.07s
+sys	0m 0.07s
+
+[TEST 3] CPU stress using expr
+Purpose   : Simulate arithmetic workload (user-space CPU load)
+Command   : expr i+1 (run 1000 times)
+----------------------------------------
+real	0m 43.06s
+user	0m 27.06s
+sys	0m 13.97s
+
+[TEST 4] perf stat: syscall + scheduling events
+Purpose   : Observe kernel-level events under syscall pressure
+Command   : busybox true (x1000 under perf)
+Events    : page-faults, context-switches, branch-misses
+Repetitions: 3
+----------------------------------------
+
+ Performance counter stats for 'sh -c i=0; while [ $i -lt 1000 ]; do busybox true; i=$((i+1)); done' (3 runs):
+
+             96845      page-faults                                                             ( +-  0.59% )
+              9729      context-switches                                                        ( +-  0.17% )
+   <not supported>      branch-misses                                                         
+
+           35.5929 +- 0.0936 seconds time elapsed  ( +-  0.26% )
+
+
+========== END OF REPORT ==========

@@ -1,0 +1,48 @@
+#!/bin/sh
+
+RESULT_FILE=/root/benchmark_results.txt
+mkdir -p "$(dirname "$RESULT_FILE")"
+
+echo "========== KERNEL MICRO-BENCHMARK REPORT ==========" > "$RESULT_FILE"
+echo "System: BusyBox + perf available" >> "$RESULT_FILE"
+echo "---------------------------------------------------" >> "$RESULT_FILE"
+echo "" >> "$RESULT_FILE"
+
+# [TEST 1] fork + exec
+echo "[TEST 1] fork + exec latency" >> "$RESULT_FILE"
+echo "Purpose   : Measure overhead of process creation and termination" >> "$RESULT_FILE"
+echo "Command   : busybox true (run 50 times)" >> "$RESULT_FILE"
+echo "----------------------------------------" >> "$RESULT_FILE"
+(time sh -c 'i=0; while [ $i -lt 50 ]; do busybox true; i=$((i+1)); done') >> "$RESULT_FILE" 2>&1
+echo "" >> "$RESULT_FILE"
+
+# [TEST 2] Disk I/O
+echo "[TEST 2] Disk I/O (write & delete 5MB)" >> "$RESULT_FILE"
+echo "Purpose   : Measure cost of writing and removing a file" >> "$RESULT_FILE"
+echo "Command   : dd if=/dev/zero of=/tmp/testfile bs=1M count=5" >> "$RESULT_FILE"
+echo "File Size : 5 MB" >> "$RESULT_FILE"
+echo "----------------------------------------" >> "$RESULT_FILE"
+(time sh -c 'dd if=/dev/zero of=/tmp/testfile bs=1M count=5 && rm /tmp/testfile') >> "$RESULT_FILE" 2>&1
+echo "" >> "$RESULT_FILE"
+
+# [TEST 3] CPU expr loop
+echo "[TEST 3] CPU stress using expr" >> "$RESULT_FILE"
+echo "Purpose   : Simulate arithmetic workload (user-space CPU load)" >> "$RESULT_FILE"
+echo "Command   : expr i+1 (run 1000 times)" >> "$RESULT_FILE"
+echo "----------------------------------------" >> "$RESULT_FILE"
+(time sh -c 'i=0; while [ $i -lt 1000 ]; do expr $i + 1 > /dev/null; i=$((i+1)); done') >> "$RESULT_FILE" 2>&1
+echo "" >> "$RESULT_FILE"
+
+# [TEST 4] perf stat
+echo "[TEST 4] perf stat: syscall + scheduling events" >> "$RESULT_FILE"
+echo "Purpose   : Observe kernel-level events under syscall pressure" >> "$RESULT_FILE"
+echo "Command   : busybox true (x1000 under perf)" >> "$RESULT_FILE"
+echo "Events    : page-faults, context-switches, branch-misses" >> "$RESULT_FILE"
+echo "Repetitions: 3" >> "$RESULT_FILE"
+echo "----------------------------------------" >> "$RESULT_FILE"
+perf stat -e page-faults,context-switches,branch-misses -r 3 \
+sh -c 'i=0; while [ $i -lt 1000 ]; do busybox true; i=$((i+1)); done' >> "$RESULT_FILE" 2>&1
+echo "" >> "$RESULT_FILE"
+
+# END
+echo "========== END OF REPORT ==========" >> "$RESULT_FILE"

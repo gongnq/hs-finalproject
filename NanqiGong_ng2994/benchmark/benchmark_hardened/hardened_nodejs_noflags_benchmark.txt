@@ -1,0 +1,36 @@
+========== NODE.JS V8 BENCHMARK REPORT ==========
+Node Version  : v22.13.1
+System        : Buildroot Node.js (no npm)
+--------------------------------------------------
+
+[TEST] Math Loop (sqrt)
+Purpose : Measure floating-point computation throughput
+Spec    : Loop 1e7 times using Math.sqrt
+------------------------------------------
+Result  : 0.8313 sec
+
+[TEST] Object Allocation
+Purpose : Stress-test garbage collection (GC)
+Spec    : Create 1 million temporary objects
+------------------------------------------
+Result  : 4.1877 sec
+
+[TEST] JSON Encode/Decode
+Purpose : Test JSON.stringify + JSON.parse performance
+Spec    : 10,000 iterations on 1000-entry object
+------------------------------------------
+Result  : 12.9593 sec
+
+[TEST] String Concatenation
+Purpose : Measure string builder performance
+Spec    : Concatenate 'abc' 10,000 times
+------------------------------------------
+Result  : 0.0111 sec
+
+[TEST] Array Ops (map + filter + reduce)
+Purpose : Test functional array operation throughput
+Spec    : map, filter, reduce on 10,000 elements
+------------------------------------------
+Result  : 0.0742 sec
+
+========== END OF REPORT ==========
